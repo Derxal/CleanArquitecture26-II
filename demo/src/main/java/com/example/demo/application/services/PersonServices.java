@@ -10,12 +10,10 @@ import com.example.demo.application.port.in.PersonGetById;
 import com.example.demo.application.port.in.PersonUpdate;
 import com.example.demo.application.port.out.PersonRepositoryPort;
 import com.example.demo.domain.model.PersonModel;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 
-@Service
 public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate, PersonUpdate, PersonDelete {
     private final PersonRepositoryPort personRepository;
     private  final PersonMapper<PersonDto> personMapper;

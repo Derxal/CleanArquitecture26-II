@@ -9,12 +9,10 @@ import com.example.demo.domain.vo.NameVO;
 import com.example.demo.domain.vo.PasswordVO;
 import com.example.demo.domain.vo.PhoneVO;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 
-@Service
 public class PersonRepositoryAdapter implements PersonRepositoryPort {
     private final PersonRepositoryJpa repositoryJpa;
     private final PersonMapper<PersonEntity> mapperEntity;

@@ -31,6 +31,7 @@ public class PersonController {
     private final PersonCreate personCreate;
     private final PersonUpdate personUpdate;
     private final PersonDelete personDelete;
+    private final PersonMapper<PersonDtoRequest> mapperRequest = new PersonMapperRequest();
 
 
 
@@ -51,10 +52,9 @@ public class PersonController {
     @PostMapping
     @Operation( summary = "Guardar")
     public ResponseEntity<PersonDto> store(@Valid @RequestBody PersonDtoRequest request){
-        PersonMapper<PersonDtoRequest> mapper = new PersonMapperRequest();
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 personCreate.create(
-                        mapper.toDomain(request)
+                        mapperRequest.toDomain(request)
                 )
         );
     }
@@ -63,11 +63,10 @@ public class PersonController {
     @PutMapping("/{id}")
     @Operation( summary = "Actualizar")
     public ResponseEntity<PersonDto> update(@PathVariable int id, @Valid @RequestBody PersonDtoRequest request){
-        PersonMapper<PersonDtoRequest> mapper = new PersonMapperRequest();
         return ResponseEntity.ok(
                 personUpdate.update(
                         id,
-                        mapper.toDomain(request)
+                        mapperRequest.toDomain(request)
                 )
         );
     }
