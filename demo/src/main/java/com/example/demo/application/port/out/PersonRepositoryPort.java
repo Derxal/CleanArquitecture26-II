@@ -8,7 +8,7 @@ public interface PersonRepositoryPort {
 
     public PersonModel getById(int id);
     public List<PersonModel> getAll();
-    public PersonModel create();
+    public PersonModel create(PersonModel personModel);
 
 
 }
