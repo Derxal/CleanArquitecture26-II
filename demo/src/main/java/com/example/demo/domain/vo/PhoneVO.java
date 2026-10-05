@@ -1,5 +1,6 @@
 package com.example.demo.domain.vo;
 
+import com.example.demo.domain.exception.InvalidValueException;
 
 public class PhoneVO {
 
@@ -12,16 +13,16 @@ public class PhoneVO {
     public PhoneVO(String value) {
 
         if(value == null || value.isBlank()){
-            throw new RuntimeException("El telefono es obligatorio");
+            throw new InvalidValueException("phone","El telefono es obligatorio");
         }
         if(!value.matches("^\\+?\\d+$")){
-            throw new RuntimeException("El telefono solo puede contener numeros");
+            throw new InvalidValueException("phone","El telefono solo puede contener numeros");
         }
         if(value.replace("+", "").length() < limitMin){
-            throw new RuntimeException("El telefono no puede tener menos de " + limitMin +" digitos");
+            throw new InvalidValueException("phone","El telefono no puede tener menos de " + limitMin +" digitos");
         }
         if(value.replace("+", "").length() > limitMax){
-            throw new RuntimeException("El telefono no puede tener mas de " + limitMax +" digitos");
+            throw new InvalidValueException("phone","El telefono no puede tener mas de " + limitMax +" digitos");
         }
         this.value = value;
     }

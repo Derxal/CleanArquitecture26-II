@@ -1,5 +1,6 @@
 package com.example.demo.domain.vo;
 
+import com.example.demo.domain.exception.InvalidValueException;
 
 public class EmailVO {
 
@@ -12,13 +13,13 @@ public class EmailVO {
     public EmailVO(String value) {
 
         if(value == null || value.isBlank()){
-            throw new RuntimeException("El email es obligatorio");
+            throw new InvalidValueException("email","El email es obligatorio");
         }
         if(value.length() > limitMax){
-            throw new RuntimeException("El email no puede tener mas de " + limitMax +" caracteres");
+            throw new InvalidValueException("email","El email no puede tener mas de " + limitMax +" caracteres");
         }
         if(!value.matches(pattern)){
-            throw new RuntimeException("El email no tiene un formato valido");
+            throw new InvalidValueException("email","El email no tiene un formato valido");
         }
         this.value = value;
     }

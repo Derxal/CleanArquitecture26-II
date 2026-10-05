@@ -41,12 +41,7 @@ public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate
 
     @Override
     public PersonDto create(PersonModel personModel) {
-        try{
-            return personMapper.toExternal(personRepository.create(personModel));
-        }catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
-        }
-
+        return personMapper.toExternal(personRepository.create(personModel));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.demo.domain.vo;
 
+import com.example.demo.domain.exception.InvalidValueException;
 
 public class NameVO {
 
@@ -11,11 +12,14 @@ public class NameVO {
 
     public NameVO(String value) {
 
+        if(value == null || value.isBlank()){
+            throw new InvalidValueException("name","El nombre es obligatorio");
+        }
         if(value.length() < limitMin){
-            throw new RuntimeException("El nombre no puede tener menos de " + limitMin +" caracteres");
+            throw new InvalidValueException("name","El nombre no puede tener menos de " + limitMin +" caracteres");
         }
         if(value.length() > limitMax){
-            throw new RuntimeException("El nombre no puede tener mas de " + limitMax +" caracteres");
+            throw new InvalidValueException("name","El nombre no puede tener mas de " + limitMax +" caracteres");
         }
         this.value = value;
     }

@@ -1,5 +1,6 @@
 package com.example.demo.domain.vo;
 
+import com.example.demo.domain.exception.InvalidValueException;
 
 public class PasswordVO {
 
@@ -12,22 +13,22 @@ public class PasswordVO {
     public PasswordVO(String value) {
 
         if(value == null || value.isBlank()){
-            throw new RuntimeException("La contraseña es obligatoria");
+            throw new InvalidValueException("password","La contraseña es obligatoria");
         }
         if(value.length() < limitMin){
-            throw new RuntimeException("La contraseña no puede tener menos de " + limitMin +" caracteres");
+            throw new InvalidValueException("password","La contraseña no puede tener menos de " + limitMin +" caracteres");
         }
         if(value.length() > limitMax){
-            throw new RuntimeException("La contraseña no puede tener mas de " + limitMax +" caracteres");
+            throw new InvalidValueException("password","La contraseña no puede tener mas de " + limitMax +" caracteres");
         }
         if(!value.matches(".*[A-Z].*")){
-            throw new RuntimeException("La contraseña debe tener al menos una letra mayuscula");
+            throw new InvalidValueException("password","La contraseña debe tener al menos una letra mayuscula");
         }
         if(!value.matches(".*[a-z].*")){
-            throw new RuntimeException("La contraseña debe tener al menos una letra minuscula");
+            throw new InvalidValueException("password","La contraseña debe tener al menos una letra minuscula");
         }
         if(!value.matches(".*\\d.*")){
-            throw new RuntimeException("La contraseña debe tener al menos un numero");
+            throw new InvalidValueException("password","La contraseña debe tener al menos un numero");
         }
         this.value = value;
     }

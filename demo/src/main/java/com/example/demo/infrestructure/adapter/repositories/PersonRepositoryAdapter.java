@@ -2,6 +2,7 @@ package com.example.demo.infrestructure.adapter.repositories;
 
 import com.example.demo.application.mapper.PersonMapper;
 import com.example.demo.application.port.out.PersonRepositoryPort;
+import com.example.demo.domain.exception.NotFoundException;
 import com.example.demo.domain.model.PersonModel;
 import com.example.demo.domain.vo.EmailVO;
 import com.example.demo.domain.vo.NameVO;
@@ -26,7 +27,7 @@ public class PersonRepositoryAdapter implements PersonRepositoryPort {
     @Override
     public PersonModel getById(int id) {
         return mapperEntity.toDomain(
-                repositoryJpa.findById(id).get()
+                findEntity(id)
         );
     }
 
@@ -52,7 +53,7 @@ public class PersonRepositoryAdapter implements PersonRepositoryPort {
 
     @Override
     public PersonModel update(PersonModel personModel) {
-        repositoryJpa.findById(personModel.getId()).get();
+        findEntity(personModel.getId());
 
         PersonEntity entity = mapperEntity.toExternal(
                 new PersonModel(
@@ -70,8 +71,13 @@ public class PersonRepositoryAdapter implements PersonRepositoryPort {
     @Override
     public void delete(int id) {
         repositoryJpa.delete(
-                repositoryJpa.findById(id).get()
+                findEntity(id)
         );
+    }
+
+    private PersonEntity findEntity(int id) {
+        return repositoryJpa.findById(id)
+                .orElseThrow(() -> new NotFoundException("persona", id));
     }
 
 }
