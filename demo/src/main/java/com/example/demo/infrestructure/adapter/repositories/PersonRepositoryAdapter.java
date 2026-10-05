@@ -3,7 +3,10 @@ package com.example.demo.infrestructure.adapter.repositories;
 import com.example.demo.application.mapper.PersonMapper;
 import com.example.demo.application.port.out.PersonRepositoryPort;
 import com.example.demo.domain.model.PersonModel;
+import com.example.demo.domain.vo.EmailVO;
 import com.example.demo.domain.vo.NameVO;
+import com.example.demo.domain.vo.PasswordVO;
+import com.example.demo.domain.vo.PhoneVO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +41,37 @@ public class PersonRepositoryAdapter implements PersonRepositoryPort {
                 new PersonModel(
                         personModel.getId(),
                         new NameVO(personModel.getName()),
-                        personModel.getEmail(),
-                        personModel.getPassword(),
-                        personModel.getPhone()
+                        new EmailVO(personModel.getEmail()),
+                        new PasswordVO(personModel.getPassword()),
+                        new PhoneVO(personModel.getPhone())
                 )
         );
 
         return mapperEntity.toDomain(repositoryJpa.save(entity));
+    }
+
+    @Override
+    public PersonModel update(PersonModel personModel) {
+        repositoryJpa.findById(personModel.getId()).get();
+
+        PersonEntity entity = mapperEntity.toExternal(
+                new PersonModel(
+                        personModel.getId(),
+                        new NameVO(personModel.getName()),
+                        new EmailVO(personModel.getEmail()),
+                        new PasswordVO(personModel.getPassword()),
+                        new PhoneVO(personModel.getPhone())
+                )
+        );
+
+        return mapperEntity.toDomain(repositoryJpa.save(entity));
+    }
+
+    @Override
+    public void delete(int id) {
+        repositoryJpa.delete(
+                repositoryJpa.findById(id).get()
+        );
     }
 
 }

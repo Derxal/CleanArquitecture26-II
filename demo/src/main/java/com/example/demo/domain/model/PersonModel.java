@@ -1,7 +1,10 @@
 package com.example.demo.domain.model;
 
 
+import com.example.demo.domain.vo.EmailVO;
 import com.example.demo.domain.vo.NameVO;
+import com.example.demo.domain.vo.PasswordVO;
+import com.example.demo.domain.vo.PhoneVO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,10 +28,11 @@ public class PersonModel {
         this.phone = phone;
     }
 
-    public PersonModel(int id, NameVO name, String email, String password, String phone) {
+    public PersonModel(int id, NameVO name, EmailVO email, PasswordVO password, PhoneVO phone) {
+        this.id = id;
         this.name = name.getValue();
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
+        this.email = email.getValue();
+        this.password = password.getValue();
+        this.phone = phone.getValue();
     }
 }

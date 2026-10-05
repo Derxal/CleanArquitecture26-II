@@ -6,7 +6,7 @@ import com.example.demo.domain.model.PersonModel;
 public class PersonMapperDto implements PersonMapper<PersonDto>{
 
     public PersonModel toDomain(PersonDto dto){
-        return null; //new PersonModel(dto.getId(), dto.getName(), dto.getEmail(), dto.getPhone() );
+        return new PersonModel(dto.getId(), dto.getName(), dto.getEmail(), null, dto.getPhone());
     }
 
     public PersonDto toExternal(PersonModel model){

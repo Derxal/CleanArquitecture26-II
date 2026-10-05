@@ -5,7 +5,9 @@ import com.example.demo.application.mapper.PersonMapper;
 import com.example.demo.application.mapper.PersonMapperDto;
 import com.example.demo.application.port.in.PersonCreate;
 import com.example.demo.application.port.in.PersonGetAll;
+import com.example.demo.application.port.in.PersonDelete;
 import com.example.demo.application.port.in.PersonGetById;
+import com.example.demo.application.port.in.PersonUpdate;
 import com.example.demo.application.port.out.PersonRepositoryPort;
 import com.example.demo.domain.model.PersonModel;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,7 @@ import java.util.List;
 
 
 @Service
-public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate {
+public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate, PersonUpdate, PersonDelete {
     private final PersonRepositoryPort personRepository;
     private  final PersonMapper<PersonDto> personMapper;
 
@@ -45,5 +47,25 @@ public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate
             throw new RuntimeException(ex.getMessage());
         }
 
+    }
+
+    @Override
+    public PersonDto update(int id, PersonModel personModel) {
+        return personMapper.toExternal(
+                personRepository.update(
+                        new PersonModel(
+                                id,
+                                personModel.getName(),
+                                personModel.getEmail(),
+                                personModel.getPassword(),
+                                personModel.getPhone()
+                        )
+                )
+        );
+    }
+
+    @Override
+    public void delete(int id) {
+        personRepository.delete(id);
     }
 }

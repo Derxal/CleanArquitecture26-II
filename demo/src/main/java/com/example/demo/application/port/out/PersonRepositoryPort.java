@@ -9,6 +9,8 @@ public interface PersonRepositoryPort {
     public PersonModel getById(int id);
     public List<PersonModel> getAll();
     public PersonModel create(PersonModel personModel);
+    public PersonModel update(PersonModel personModel);
+    public void delete(int id);
 
 
 }
