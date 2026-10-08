@@ -1,4 +1,4 @@
-package com.example.demo.infrestructure.adapter.repositories;
+package com.example.demo.infrestructure.adapter.repositories.person;
 
 import com.example.demo.application.mapper.PersonMapper;
 import com.example.demo.domain.model.PersonModel;

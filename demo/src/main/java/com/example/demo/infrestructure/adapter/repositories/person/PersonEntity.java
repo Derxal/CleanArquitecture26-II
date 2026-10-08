@@ -1,4 +1,4 @@
-package com.example.demo.infrestructure.adapter.repositories;
+package com.example.demo.infrestructure.adapter.repositories.person;
 
 
 import jakarta.persistence.*;
@@ -22,7 +22,7 @@ public class PersonEntity {
     @Column
     private String name;
 
-    @Column
+    @Column(unique = true)
     private String email;
 
     @Column

@@ -8,7 +8,9 @@ import com.example.demo.application.port.in.PersonGetAll;
 import com.example.demo.application.port.in.PersonDelete;
 import com.example.demo.application.port.in.PersonGetById;
 import com.example.demo.application.port.in.PersonUpdate;
+import com.example.demo.application.port.out.PasswordEncoderPort;
 import com.example.demo.application.port.out.PersonRepositoryPort;
+import com.example.demo.domain.exception.PersonAlreadyExistsException;
 import com.example.demo.domain.model.PersonModel;
 
 import java.util.List;
@@ -16,11 +18,13 @@ import java.util.List;
 
 public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate, PersonUpdate, PersonDelete {
     private final PersonRepositoryPort personRepository;
+    private final PasswordEncoderPort passwordEncoder;
     private  final PersonMapper<PersonDto> personMapper;
 
 
-    public PersonServices(PersonRepositoryPort personRepository) {
+    public PersonServices(PersonRepositoryPort personRepository, PasswordEncoderPort passwordEncoder) {
         this.personRepository = personRepository;
+        this.passwordEncoder = passwordEncoder;
         this.personMapper = new PersonMapperDto();
     }
 
@@ -38,21 +42,38 @@ public class PersonServices implements PersonGetById, PersonGetAll, PersonCreate
     }
 
     @Override
-    public PersonDto create(PersonModel personModel) {
-        return personMapper.toExternal(personRepository.create(personModel));
+    public PersonDto create(PersonModel person) {
+     
+        if(personRepository.existsByEmail(person.getEmail())){
+            throw new PersonAlreadyExistsException("email", person.getEmail());
+        }
+
+        return personMapper.toExternal(
+                personRepository.create(
+                        person.withEncodedPassword(passwordEncoder.encode(person.getPassword()))
+                )
+        );
     }
 
     @Override
     public PersonDto update(int id, PersonModel personModel) {
+        PersonModel current = personRepository.getById(id);
+        PersonModel person = current.update(
+                personModel.getName(),
+                personModel.getEmail(),
+                personModel.getPassword(),
+                personModel.getPhone()
+        );
+
+        boolean emailChanged = !current.getEmail().equalsIgnoreCase(person.getEmail());
+
+        if(emailChanged && personRepository.existsByEmail(person.getEmail())){
+            throw new PersonAlreadyExistsException("email", person.getEmail());
+        }
+
         return personMapper.toExternal(
                 personRepository.update(
-                        new PersonModel(
-                                id,
-                                personModel.getName(),
-                                personModel.getEmail(),
-                                personModel.getPassword(),
-                                personModel.getPhone()
-                        )
+                        person.withEncodedPassword(passwordEncoder.encode(person.getPassword()))
                 )
         );
     }

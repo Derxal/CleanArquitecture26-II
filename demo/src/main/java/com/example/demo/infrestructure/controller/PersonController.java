@@ -61,7 +61,6 @@ public class PersonController {
 
 
     @PutMapping("/{id}")
-    @Operation( summary = "Actualizar")
     public ResponseEntity<PersonDto> update(@PathVariable int id, @Valid @RequestBody PersonDtoRequest request){
         return ResponseEntity.ok(
                 personUpdate.update(
@@ -73,7 +72,6 @@ public class PersonController {
 
 
     @DeleteMapping("/{id}")
-    @Operation( summary = "Eliminar")
     public ResponseEntity<Void> delete(@PathVariable int id){
         personDelete.delete(id);
         return ResponseEntity.noContent().build();

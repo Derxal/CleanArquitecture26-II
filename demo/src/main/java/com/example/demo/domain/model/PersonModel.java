@@ -1,11 +1,6 @@
 package com.example.demo.domain.model;
 
 
-import com.example.demo.domain.vo.EmailVO;
-import com.example.demo.domain.vo.NameVO;
-import com.example.demo.domain.vo.PasswordVO;
-import com.example.demo.domain.vo.PhoneVO;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,11 +23,11 @@ public class PersonModel {
         this.phone = phone;
     }
 
-    public PersonModel(int id, NameVO name, EmailVO email, PasswordVO password, PhoneVO phone) {
-        this.id = id;
-        this.name = name.getValue();
-        this.email = email.getValue();
-        this.password = password.getValue();
-        this.phone = phone.getValue();
+    public PersonModel update(String name, String email, String password, String phone) {
+        return new PersonModel(this.id, name, email, password, phone);
+    }
+
+    public PersonModel withEncodedPassword(String encodedPassword) {
+        return new PersonModel(this.id, this.name, this.email, encodedPassword, this.phone);
     }
 }

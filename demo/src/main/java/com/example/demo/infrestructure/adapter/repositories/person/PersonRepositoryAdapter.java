@@ -1,4 +1,4 @@
-package com.example.demo.infrestructure.adapter.repositories;
+package com.example.demo.infrestructure.adapter.repositories.person;
 
 import com.example.demo.application.mapper.PersonMapper;
 import com.example.demo.application.port.out.PersonRepositoryPort;
@@ -8,9 +8,9 @@ import com.example.demo.domain.vo.EmailVO;
 import com.example.demo.domain.vo.NameVO;
 import com.example.demo.domain.vo.PasswordVO;
 import com.example.demo.domain.vo.PhoneVO;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public class PersonRepositoryAdapter implements PersonRepositoryPort {
@@ -36,40 +36,44 @@ public class PersonRepositoryAdapter implements PersonRepositoryPort {
 
     @Override
     public PersonModel create(PersonModel personModel) {
-        PersonEntity entity = mapperEntity.toExternal(
-                new PersonModel(
-                        personModel.getId(),
-                        new NameVO(personModel.getName()),
-                        new EmailVO(personModel.getEmail()),
-                        new PasswordVO(personModel.getPassword()),
-                        new PhoneVO(personModel.getPhone())
-                )
+        return mapperEntity.toDomain(
+                repositoryJpa.save(mapperEntity.toExternal(validate(personModel)))
         );
-
-        return mapperEntity.toDomain(repositoryJpa.save(entity));
     }
 
     @Override
     public PersonModel update(PersonModel personModel) {
         findEntity(personModel.getId());
 
-        PersonEntity entity = mapperEntity.toExternal(
-                new PersonModel(
-                        personModel.getId(),
-                        new NameVO(personModel.getName()),
-                        new EmailVO(personModel.getEmail()),
-                        new PasswordVO(personModel.getPassword()),
-                        new PhoneVO(personModel.getPhone())
-                )
+        return mapperEntity.toDomain(
+                repositoryJpa.save(mapperEntity.toExternal(validate(personModel)))
         );
-
-        return mapperEntity.toDomain(repositoryJpa.save(entity));
     }
 
     @Override
     public void delete(int id) {
         repositoryJpa.delete(
                 findEntity(id)
+        );
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return repositoryJpa.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<PersonModel> findByEmail(String email) {
+        return repositoryJpa.findByEmail(email).map( entity -> mapperEntity.toDomain( entity ) );
+    }
+
+    private PersonModel validate(PersonModel personModel) {
+        return new PersonModel(
+                personModel.getId(),
+                new NameVO(personModel.getName()).getValue(),
+                new EmailVO(personModel.getEmail()).getValue(),
+                new PasswordVO(personModel.getPassword()).getValue(),
+                new PhoneVO(personModel.getPhone()).getValue()
         );
     }
 
