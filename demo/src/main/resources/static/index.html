@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestión de Personas</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --border: #dfe2e7;
+    --text: #1d2330;
+    --muted: #6b7280;
+    --primary: #2f5bea;
+    --primary-hover: #2449c4;
+    --primary-text: #ffffff;
+    --danger: #d33b3b;
+    --danger-bg: #fdecec;
+    --success-bg: #e8f6ee;
+    --success: #1f7a4a;
+    --row-hover: #f8f9fb;
+    --shadow: 0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c;
+      --surface: #1b1f29;
+      --border: #2c3240;
+      --text: #e6e8ee;
+      --muted: #9aa1b1;
+      --primary: #5b7fff;
+      --primary-hover: #7593ff;
+      --danger: #f06a6a;
+      --danger-bg: #3a1f22;
+      --success-bg: #1a3326;
+      --success: #6fd39d;
+      --row-hover: #222734;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .4);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .hidden { display: none !important; }
+
+  /* ---------- Auth ---------- */
+  .auth-wrap {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .auth-card { width: 100%; max-width: 400px; padding: 28px; }
+  .auth-card h1 { margin: 0 0 4px; font-size: 1.4rem; }
+  .auth-card p.sub { margin: 0 0 20px; color: var(--muted); font-size: .9rem; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .tab {
+    flex: 1; background: none; border: none; padding: 10px; cursor: pointer;
+    color: var(--muted); font: inherit; font-weight: 600;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* ---------- Forms ---------- */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 4px; }
+  .field input {
+    width: 100%; padding: 9px 11px; font: inherit; color: var(--text);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+  }
+  .field input:focus { outline: 2px solid var(--primary); outline-offset: -1px; border-color: transparent; }
+  .field input.invalid { border-color: var(--danger); }
+  .field .err { color: var(--danger); font-size: .8rem; margin-top: 3px; min-height: 0; }
+  .field .hint { color: var(--muted); font-size: .78rem; margin-top: 3px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 16px; font: inherit; font-weight: 600; font-size: .9rem;
+    border-radius: 7px; border: 1px solid var(--border); cursor: pointer;
+    background: var(--surface); color: var(--text);
+  }
+  .btn:hover { background: var(--row-hover); }
+  .btn:disabled { opacity: .6; cursor: default; }
+  .btn-primary { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-danger { color: var(--danger); }
+  .btn-danger.solid { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .btn-sm { padding: 5px 10px; font-size: .8rem; }
+  .btn-block { width: 100%; }
+
+  .alert { padding: 10px 12px; border-radius: 7px; font-size: .88rem; margin-bottom: 14px; }
+  .alert-error { background: var(--danger-bg); color: var(--danger); }
+  .alert-success { background: var(--success-bg); color: var(--success); }
+
+  /* ---------- App ---------- */
+  header.topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  .topbar-inner {
+    max-width: 1000px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .brand { font-weight: 700; font-size: 1.05rem; }
+  .user { display: flex; align-items: center; gap: 12px; font-size: .9rem; color: var(--muted); }
+  .user strong { color: var(--text); }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .toolbar h2 { margin: 0; font-size: 1.25rem; }
+  .toolbar .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .search {
+    padding: 8px 11px; font: inherit; font-size: .9rem; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 7px; min-width: 220px;
+  }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; }
+  tbody tr:hover { background: var(--row-hover); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { color: var(--muted); font-variant-numeric: tabular-nums; }
+  td.row-actions { text-align: right; }
+  td.row-actions .btn + .btn { margin-left: 6px; }
+  .badge { font-size: .72rem; background: var(--primary); color: var(--primary-text); padding: 1px 7px; border-radius: 99px; margin-left: 6px; }
+  .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+
+  /* ---------- Modal ---------- */
+  dialog {
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 0;
+    background: var(--surface); color: var(--text); width: min(440px, calc(100vw - 32px));
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .25);
+  }
+  dialog::backdrop { background: rgba(10, 12, 18, .5); }
+  .modal-head { padding: 18px 22px 0; }
+  .modal-head h3 { margin: 0; font-size: 1.1rem; }
+  .modal-body { padding: 16px 22px; }
+  .modal-foot { padding: 0 22px 20px; display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* ---------- Toast ---------- */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    padding: 10px 16px; border-radius: 8px; font-size: .9rem; box-shadow: var(--shadow);
+    z-index: 100; max-width: calc(100vw - 32px);
+  }
+
+  @media (max-width: 600px) {
+    .search { min-width: 0; flex: 1; }
+    .toolbar .actions { width: 100%; }
+    th.col-phone, td.col-phone { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= AUTH ================= -->
+<section id="authView" class="auth-wrap hidden">
+  <div class="card auth-card">
+    <h1>Gestión de Personas</h1>
+    <p class="sub">Clean Architecture · Spring Boot</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="login" type="button">Iniciar sesión</button>
+      <button class="tab" data-tab="register" type="button">Crear cuenta</button>
+    </div>
+
+    <div id="authAlert" class="alert hidden"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" name="email" type="email" autocomplete="email" required>
+        <div class="err" data-err="email"></div>
+      </div>
+      <div class="field">
+        <label for="loginPassword">Contraseña</label>
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+        <div class="err" data-err="password"></div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+    </form>
+
+    <form id="registerForm" class="hidden" novalidate>
+      <div class="field">
+        <label for="regName">Nombre</label>
+        <input id="regName" name="name" autocomplete="name" required>
+        <div class="err" data-err="name"></div>
+      </div>
+      <div class="field">
+        <label for="regEmail">Email</label>
+        <input id="regEmail" name="email" type="email" autocomplete="email" required>
+        <div class="err" data-err="email"></div>
+      </div>
+      <div class="field">
+        <label for="regPhone">Teléfono</label>
+        <input id="regPhone" name="phone" type="tel" autocomplete="tel" placeholder="+59170000000">
+        <div class="err" data-err="phone"></div>
+      </div>
+      <div class="field">
+        <label for="regPassword">Contraseña</label>
+        <input id="regPassword" name="password" type="password" autocomplete="new-password" required>
+        <div class="hint">Mínimo 8 caracteres, con mayúscula, minúscula y número.</div>
+        <div class="err" data-err="password"></div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Crear cuenta</button>
+    </form>
+  </div>
+</section>
+
+<!-- ================= APP ================= -->
+<section id="appView" class="hidden">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Gestión de Personas</div>
+      <div class="user">
+        <span>Hola, <strong id="userName"></strong></span>
+        <button id="logoutBtn" class="btn btn-sm" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <h2>Personas <span id="count" class="badge">0</span></h2>
+      <div class="actions">
+        <input id="search" class="search" type="search" placeholder="Buscar por nombre, email o teléfono">
+        <button id="reloadBtn" class="btn" type="button" title="Recargar">↻</button>
+        <button id="newBtn" class="btn btn-primary" type="button">+ Nueva persona</button>
+      </div>
+    </div>
+
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th class="col-phone">Teléfono</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div id="empty" class="empty hidden"></div>
+    </div>
+  </main>
+</section>
+
+<!-- ================= MODAL: crear / editar ================= -->
+<dialog id="personDialog">
+  <form id="personForm" novalidate>
+    <div class="modal-head"><h3 id="personTitle">Nueva persona</h3></div>
+    <div class="modal-body">
+      <div id="personAlert" class="alert alert-error hidden"></div>
+      <input type="hidden" name="id">
+      <div class="field">
+        <label for="pName">Nombre</label>
+        <input id="pName" name="name" required>
+        <div class="err" data-err="name"></div>
+      </div>
+      <div class="field">
+        <label for="pEmail">Email</label>
+        <input id="pEmail" name="email" type="email" required>
+        <div class="err" data-err="email"></div>
+      </div>
+      <div class="field">
+        <label for="pPhone">Teléfono</label>
+        <input id="pPhone" name="phone" type="tel">
+        <div class="err" data-err="phone"></div>
+      </div>
+      <div class="field">
+        <label for="pPassword">Contraseña</label>
+        <input id="pPassword" name="password" type="password" autocomplete="new-password" required>
+        <div class="hint" id="pPasswordHint">Mínimo 8 caracteres, con mayúscula, minúscula y número.</div>
+        <div class="err" data-err="password"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" type="button" data-close>Cancelar</button>
+      <button class="btn btn-primary" type="submit">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ================= MODAL: confirmar borrado ================= -->
+<dialog id="deleteDialog">
+  <div class="modal-head"><h3>Eliminar persona</h3></div>
+  <div class="modal-body">
+    <p style="margin:0">¿Seguro que quieres eliminar a <strong id="deleteName"></strong>? Esta acción no se puede deshacer.</p>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" type="button" data-close>Cancelar</button>
+    <button id="confirmDelete" class="btn btn-danger solid" type="button">Eliminar</button>
+  </div>
+</dialog>
+
+<div id="toast" class="hidden"></div>
+
+<script>
+(() => {
+  const API = '/api';
+  const STORAGE_KEY = 'demo.session';
+  const $ = (sel) => document.querySelector(sel);
+
+  let session = loadSession();
+  let persons = [];
+  let deletingId = null;
+
+  /* ---------------- Sesión ---------------- */
+  function loadSession() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
+  }
+  function saveSession(s) {
+    session = s;
+    try {
+      s ? localStorage.setItem(STORAGE_KEY, JSON.stringify(s)) : localStorage.removeItem(STORAGE_KEY);
+    } catch { /* almacenamiento no disponible: la sesión vive solo en memoria */ }
+  }
+
+  /* ---------------- HTTP ---------------- */
+  async function api(path, { method = 'GET', body } = {}) {
+    const headers = {};
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    if (session?.token) headers['Authorization'] = 'Bearer ' + session.token;
+
+    let res;
+    try {
+      res = await fetch(API + path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined });
+    } catch {
+      throw { detail: 'No se pudo conectar con el servidor' };
+    }
+    if (res.status === 204) return null;
+
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw data || { detail: 'Error ' + res.status };
+    return data;
+  }
+
+  /* ---------------- Errores (ProblemDetail) ---------------- */
+  function clearErrors(form) {
+    form.querySelectorAll('.err').forEach(e => e.textContent = '');
+    form.querySelectorAll('input.invalid').forEach(i => i.classList.remove('invalid'));
+  }
+  // El backend devuelve { detail, field } (InvalidValueException / duplicado)
+  // o { detail, errors: { campo: mensaje } } (Bean Validation).
+  function showErrors(form, err, alertEl) {
+    const fields = { ...(err?.errors || {}) };
+    if (err?.field) fields[err.field] = err.detail;
+
+    let shownInField = false;
+    for (const [name, msg] of Object.entries(fields)) {
+      const box = form.querySelector(`[data-err="${name}"]`);
+      const input = form.querySelector(`[name="${name}"]`);
+      if (box) { box.textContent = msg; shownInField = true; }
+      if (input) input.classList.add('invalid');
+    }
+    if (alertEl && !shownInField) showAlert(alertEl, err?.detail || 'Ocurrió un error', 'error');
+  }
+  function showAlert(el, msg, type) {
+    el.textContent = msg;
+    el.className = 'alert alert-' + type;
+  }
+  function hideAlert(el) { el.className = 'alert hidden'; }
+
+  function toast(msg, type = 'success') {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.className = 'alert-' + type;
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => t.className = 'hidden', 2800);
+  }
+
+  function formData(form) {
+    return Object.fromEntries(new FormData(form).entries());
+  }
+
+  async function withBusy(form, fn) {
+    const btn = form.querySelector('[type="submit"]');
+    btn.disabled = true;
+    try { await fn(); } finally { btn.disabled = false; }
+  }
+
+  /* ---------------- Vistas ---------------- */
+  function render() {
+    const logged = !!session?.token;
+    $('#authView').classList.toggle('hidden', logged);
+    $('#appView').classList.toggle('hidden', !logged);
+    if (logged) {
+      $('#userName').textContent = session.name || session.email;
+      loadPersons();
+    }
+  }
+
+  /* ---------------- Auth ---------------- */
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const isLogin = tab.dataset.tab === 'login';
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+      $('#loginForm').classList.toggle('hidden', !isLogin);
+      $('#registerForm').classList.toggle('hidden', isLogin);
+      hideAlert($('#authAlert'));
+    });
+  });
+
+  async function login(email, password) {
+    const data = await api('/auth/login', { method: 'POST', body: { email, password } });
+    saveSession(data);
+    render();
+  }
+
+  $('#loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = e.target;
+    clearErrors(form);
+    hideAlert($('#authAlert'));
+    const { email, password } = formData(form);
+
+    withBusy(form, async () => {
+      try {
+        await login(email, password);
+        form.reset();
+      } catch (err) {
+        showErrors(form, err, $('#authAlert'));
+      }
+    });
+  });
+
+  $('#registerForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = e.target;
+    clearErrors(form);
+    hideAlert($('#authAlert'));
+    const data = formData(form);
+
+    withBusy(form, async () => {
+      try {
+        await api('/persons', { method: 'POST', body: data });
+        await login(data.email, data.password);
+        form.reset();
+        toast('Cuenta creada. ¡Bienvenido!');
+      } catch (err) {
+        showErrors(form, err, $('#authAlert'));
+      }
+    });
+  });
+
+  $('#logoutBtn').addEventListener('click', async () => {
+    try { await api('/auth/logout', { method: 'POST' }); } catch { /* el token ya no existe */ }
+    saveSession(null);
+    persons = [];
+    render();
+  });
+
+  /* ---------------- Listado ---------------- */
+  async function loadPersons() {
+    try {
+      persons = await api('/persons/all') || [];
+      renderRows();
+    } catch (err) {
+      toast(err?.detail || 'No se pudo cargar el listado', 'error');
+    }
+  }
+
+  function escapeHtml(v) {
+    return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderRows() {
+    const q = $('#search').value.trim().toLowerCase();
+    const list = q
+      ? persons.filter(p => [p.name, p.email, p.phone].some(v => (v || '').toLowerCase().includes(q)))
+      : persons;
+
+    $('#count').textContent = persons.length;
+    $('#rows').innerHTML = list.map(p => `
+      <tr>
+        <td class="num">${p.id}</td>
+        <td>${escapeHtml(p.name)}${p.id === session?.personId ? ' <span class="badge">tú</span>' : ''}</td>
+        <td>${escapeHtml(p.email)}</td>
+        <td class="col-phone">${escapeHtml(p.phone) || '<span style="color:var(--muted)">—</span>'}</td>
+        <td class="row-actions">
+          <button class="btn btn-sm" data-edit="${p.id}" type="button">Editar</button>
+          <button class="btn btn-sm btn-danger" data-delete="${p.id}" type="button">Eliminar</button>
+        </td>
+      </tr>`).join('');
+
+    const empty = $('#empty');
+    empty.classList.toggle('hidden', list.length > 0);
+    empty.textContent = persons.length ? 'Ninguna persona coincide con la búsqueda.' : 'Todavía no hay personas registradas.';
+  }
+
+  $('#search').addEventListener('input', renderRows);
+  $('#reloadBtn').addEventListener('click', loadPersons);
+
+  $('#rows').addEventListener('click', (e) => {
+    const editId = e.target.dataset.edit;
+    const delId = e.target.dataset.delete;
+    if (editId) openPersonDialog(persons.find(p => p.id === Number(editId)));
+    if (delId) openDeleteDialog(persons.find(p => p.id === Number(delId)));
+  });
+
+  /* ---------------- Crear / editar ---------------- */
+  const personDialog = $('#personDialog');
+  const personForm = $('#personForm');
+
+  function openPersonDialog(person) {
+    personForm.reset();
+    clearErrors(personForm);
+    hideAlert($('#personAlert'));
+
+    const editing = !!person;
+    $('#personTitle').textContent = editing ? 'Editar persona' : 'Nueva persona';
+    // El backend vuelve a cifrar la contraseña al actualizar, por eso también se pide al editar.
+    $('#pPasswordHint').textContent = editing
+      ? 'Obligatoria: escribe la contraseña actual o una nueva.'
+      : 'Mínimo 8 caracteres, con mayúscula, minúscula y número.';
+
+    personForm.id.value = person?.id ?? '';
+    personForm.name.value = person?.name ?? '';
+    personForm.email.value = person?.email ?? '';
+    personForm.phone.value = person?.phone ?? '';
+    personDialog.showModal();
+    personForm.name.focus();
+  }
+
+  $('#newBtn').addEventListener('click', () => openPersonDialog(null));
+
+  personForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearErrors(personForm);
+    hideAlert($('#personAlert'));
+    const data = formData(personForm);
+    const id = data.id;
+    delete data.id;
+
+    withBusy(personForm, async () => {
+      try {
+        if (id) {
+          const updated = await api('/persons/' + id, { method: 'PUT', body: data });
+          if (updated.id === session?.personId) saveSession({ ...session, name: updated.name, email: updated.email });
+          $('#userName').textContent = session.name;
+          toast('Persona actualizada');
+        } else {
+          await api('/persons', { method: 'POST', body: data });
+          toast('Persona creada');
+        }
+        personDialog.close();
+        loadPersons();
+      } catch (err) {
+        showErrors(personForm, err, $('#personAlert'));
+      }
+    });
+  });
+
+  /* ---------------- Eliminar ---------------- */
+  const deleteDialog = $('#deleteDialog');
+
+  function openDeleteDialog(person) {
+    deletingId = person.id;
+    $('#deleteName').textContent = person.name;
+    deleteDialog.showModal();
+  }
+
+  $('#confirmDelete').addEventListener('click', async () => {
+    const btn = $('#confirmDelete');
+    btn.disabled = true;
+    try {
+      await api('/persons/' + deletingId, { method: 'DELETE' });
+      deleteDialog.close();
+      toast('Persona eliminada');
+      if (deletingId === session?.personId) {
+        saveSession(null);
+        render();
+      } else {
+        loadPersons();
+      }
+    } catch (err) {
+      deleteDialog.close();
+      toast(err?.detail || 'No se pudo eliminar', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.querySelectorAll('[data-close]').forEach(b =>
+    b.addEventListener('click', () => b.closest('dialog').close()));
+
+  render();
+})();
+</script>
+</body>
+</html>
